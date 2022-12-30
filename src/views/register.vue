@@ -1,0 +1,211 @@
+<template>
+  <div class="page-register" style="padding: 1em">
+    <section>
+      <div>
+        <el-form
+          ref="formRef"
+          :model="registerForm"
+          :rules="rules"
+          label-width="100px"
+          class="register-form"
+          autocomplete="off"
+        >
+          <el-form-item label="用户名" prop="name">
+            <el-input v-model="registerForm.name" />
+          </el-form-item>
+          <el-form-item label="密码" prop="pwd">
+            <el-input v-model="registerForm.pwd" type="password" />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="cpwd">
+            <el-input v-model="registerForm.cpwd" type="password" />
+          </el-form-item>
+          <!-- <el-form-item label="验证码" prop="code">
+            <el-input v-model="registerForm.code" maxlength="4" />
+          </el-form-item> -->
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="registerForm.email" />
+            <!-- <el-button size="small" round @click="sendMsg">发送验证码</el-button>
+            <span class="status">{{ statusMsg }}</span> -->
+          </el-form-item>
+          <el-form-item label="电话" prop="phone">
+            <el-input v-model="registerForm.phone" />
+          </el-form-item>
+          <el-form-item prop="agreed">
+            <el-checkbox v-model="registerForm.agreed">同意注册协议</el-checkbox>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitForm(formRef)">注册</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="login">
+          <span class="bold">已有账号？</span>
+          <span><router-link :to="{ name: 'login' }">登录</router-link></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ElMessage, ElNotification } from "element-plus";
+import { encrypt } from "@/utils/rsaEncrypt";
+import type { FormInstance } from "element-plus";
+import axios from "@/utils/request";
+import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
+
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+
+const statusMsg = ref("");
+const error = ref("");
+const registerForm = reactive({
+  name: "",
+  code: "",
+  pwd: "",
+  cpwd: "",
+  email: "",
+  phone: "",
+  agreed: false,
+});
+const rules = {
+  agreed: [
+    {
+      validator: (rule, value, callback) => {
+        if (value !== true) {
+          callback(new Error("请确认同意注册协议"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
+  ],
+  name: [
+    {
+      required: true,
+      type: "string",
+      message: "请输入用户名",
+      trigger: "blur",
+    },
+  ],
+  email: [
+    {
+      required: true,
+      type: "email",
+      message: "请输入邮箱",
+      trigger: "blur",
+    },
+  ],
+  pwd: [
+    {
+      required: true,
+      message: "创建密码",
+      trigger: "blur",
+    },
+  ],
+  cpwd: [
+    {
+      required: true,
+      message: "确认密码",
+      trigger: "blur",
+    },
+    {
+      validator: (rule, value, callback) => {
+        if (value === "") {
+          callback(new Error("请再次输入密码"));
+        } else if (value !== registerForm.pwd) {
+          callback(new Error("两次输入密码不一致"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
+  ],
+};
+const formRef = ref<FormInstance>();
+
+async function submitForm(formEl: FormInstance) {
+  console.log("submit register111");
+  await formEl.validate(async (valid, fields) => {
+    console.log("submit register11", valid, fields);
+    if (!valid) {
+      //return;
+    }
+    console.log("submit register");
+    try {
+      const res = await axios.post("/auth/register", {
+        username: registerForm.name,
+        password: registerForm.pwd,
+        name: "",
+        phone: registerForm.phone,
+        email: registerForm.email,
+      });
+      console.log("reRegister", res.data);
+      if (res.data.code == 200) {
+        store.commit("login", res.data.result);
+        // let path = route.query.redirect;
+        // if (path) {
+        //   router.replace({ path: path });
+        // } else {
+        //   router.replace({ name: "index" });
+        // }
+        ElMessage({ message: res.data.message, type: "success" });
+      } else {
+        ElMessage({ message: res.data.message, type: "error" });
+      }
+    } catch (e) {
+      //ElMessage({ message: "注册失败，网络连接错误", type: "error" });
+    }
+  });
+}
+</script>
+
+<style lang="scss" scoped>
+.page-register {
+  .register {
+    color: #1890ff;
+  }
+
+  a {
+    color: #1890ff;
+    text-decoration: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  > section {
+    margin: 0em auto 0em;
+    padding-top: 30px;
+    width: 400px;
+    box-sizing: border-box;
+
+    > div {
+      background-color: white;
+      padding: 1em 1em;
+    }
+
+    .status {
+      font-size: 12px;
+      margin-left: 20px;
+      color: #e6a23c;
+    }
+
+    .error {
+      color: red;
+    }
+  }
+}
+
+// .register-form {
+//   margin: 2em;
+//   border-radius: 6px;
+//   background: #ffffff;
+//   width: 385px;
+//   padding: 25px 25px 5px 25px;
+// }
+</style>
