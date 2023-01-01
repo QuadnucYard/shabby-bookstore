@@ -1,73 +1,58 @@
 <template>
-  <div class="login">
-    <el-form
-      ref="formRef"
-      :model="loginForm"
-      :rules="loginRules"
-      label-position="left"
-      label-width="0px"
-      class="login-form"
-    >
-      <h3 class="title">欢迎使用</h3>
-      <el-form-item prop="username">
-        <label>用户名</label>
-        <el-input
-          v-model="loginForm.username"
-          type="text"
-          auto-complete="off"
-          placeholder="用户名、手机号或电子邮箱"
-        />
-      </el-form-item>
-      <el-form-item prop="password">
-        <label>密码</label>
-        <el-input
-          v-model="loginForm.password"
-          type="password"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter="handleLogin"
-        />
-      </el-form-item>
-      <el-form-item prop="code">
-        <label>验证码</label>
-        <el-input
-          v-model="loginForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 55%"
-          @keyup.enter="handleLogin"
-        />
-        <div class="login-code">
-          <img :src="captcha" title="看不清？点击刷新" @click="getCode" alt="" />
-        </div>
-      </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe"> 记住我 </el-checkbox>
-      <el-form-item style="width: 100%">
-        <el-button
-          :loading="loading"
-          size="default"
-          type="primary"
-          style="width: 100%"
-          @click.prevent="handleLogin(formRef)"
-        >
-          <span v-if="!loading">登 录</span>
-          <span v-else>登 录 中...</span>
-        </el-button>
-      </el-form-item>
-      <el-form-item style="width: 100%">
-        <router-link :to="{ name: 'register' }">注册</router-link>
-      </el-form-item>
-    </el-form>
+  <div class="center-form-wrapper">
+    <el-card class="center-form">
+      <el-form ref="formRef" :model="loginForm" :rules="loginRules" label-width="80px">
+        <h1 class="title">欢迎使用</h1>
+        <el-form-item label="用户名" prop="username">
+          <el-input
+            v-model="loginForm.username"
+            type="text"
+            auto-complete="off"
+            placeholder="用户名、手机号或电子邮箱"
+          />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="loginForm.password"
+            type="password"
+            auto-complete="off"
+            placeholder="密码"
+            @keyup.enter="handleLogin"
+          />
+        </el-form-item>
+        <el-form-item label="验证码" prop="code">
+          <el-input
+            v-model="loginForm.code"
+            auto-complete="off"
+            placeholder="验证码"
+            style="width: 55%"
+            @keyup.enter="handleLogin"
+          />
+          <div class="login-code">
+            <img :src="captcha" title="看不清？点击刷新" @click="getCode" alt="" />
+          </div>
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="loginForm.rememberMe"> 记住我 </el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.prevent="handleLogin(formRef!)">登录</el-button>
+        </el-form-item>
+        <el-form-item>
+          <router-link :underline="false" :to="{ name: 'register' }">注册</router-link>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElNotification } from "element-plus";
-import type { FormInstance, FormRules } from "element-plus";
+import { login } from "@/api/auth";
+import type { FormInstance } from "element-plus";
+import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import axios from "@/utils/request";
 
 const route = useRoute();
 const router = useRouter();
@@ -145,14 +130,14 @@ async function handleLogin(formEl: FormInstance) {
     if (user.rememberMe) {
       Cookies.set("username", user.username, { expires: 7 });
       Cookies.set("password", user.password, { expires: 7 });
-      Cookies.set("rememberMe", user.rememberMe, { expires: 7 });
+      Cookies.set("rememberMe", "true", { expires: 7 });
     } else {
       Cookies.remove("username");
       Cookies.remove("password");
       Cookies.remove("rememberMe");
     }
     console.log("store", store.state);
-    const res = await axios.post("/auth/login", user);
+    const res = await login(user);
     console.log("reLogin", res.data);
     if (res.data.code == 200) {
       store.commit("login", res.data.result);
@@ -168,56 +153,19 @@ async function handleLogin(formEl: FormInstance) {
         type: "error",
       });
     }
-
     return false;
   });
 }
 function point() {
   const point = Cookies.get("point");
   if (point) {
-    ElNotification({
-      title: "提示",
-      message: "当前登录状态已过期，请重新登录！",
-      type: "warning",
-      duration: 5000,
-    });
+    ElMessage.warning("当前登录状态已过期，请重新登录！");
     Cookies.remove("point");
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-size: cover;
-}
-.title {
-  margin: 0 auto 30px auto;
-  text-align: center;
-  color: #707070;
-}
-
-.login-form {
-  margin: 2em;
-  border-radius: 6px;
-  background: #ffffff;
-  width: 385px;
-  padding: 25px 25px 5px 25px;
-  .el-input {
-    height: 38px;
-    input {
-      height: 38px;
-    }
-  }
-  .input-icon {
-    height: 39px;
-    width: 14px;
-    margin-left: 2px;
-  }
-}
 .login-tip {
   font-size: 13px;
   text-align: center;
@@ -232,17 +180,5 @@ function point() {
     cursor: pointer;
     vertical-align: middle;
   }
-}
-.register {
-  float: right;
-  color: rgb(24, 144, 255);
-}
-a {
-  color: #1890ff;
-  text-decoration: none;
-  background-color: transparent;
-  outline: none;
-  cursor: pointer;
-  transition: color 0.3s;
 }
 </style>

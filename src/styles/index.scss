@@ -4,11 +4,11 @@
 
 body {
   font-family:
-    /*"Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",*/
-    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    /*"Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",*/ "Microsoft YaHei",
+    "微软雅黑", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 20px;
+  margin: 0;
   //background: #1e1e1e;
 }
 
@@ -21,4 +21,38 @@ code {
   padding: 2px 4px;
   background-color: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
+}
+
+.center-form-wrapper {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+
+  .title {
+    margin: 0 auto 30px auto;
+    text-align: center;
+    color: #707070;
+  }
+
+  .center-form {
+    margin: 2em;
+    // border-radius: 6px;
+    width: 400px;
+    // background: #ffffff;
+
+    padding: 25px 25px 5px 25px;
+    /* .el-input {
+      height: 38px;
+      input {
+        height: 38px;
+      }
+    } */
+    /* .input-icon {
+      height: 39px;
+      width: 14px;
+      margin-left: 2px;
+    } */
+  }
 }

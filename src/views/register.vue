@@ -1,56 +1,54 @@
 <template>
-  <div class="page-register" style="padding: 1em">
-    <section>
-      <div>
-        <el-form
-          ref="formRef"
-          :model="registerForm"
-          :rules="rules"
-          label-width="100px"
-          class="register-form"
-          autocomplete="off"
-        >
-          <el-form-item label="用户名" prop="name">
-            <el-input v-model="registerForm.name" />
-          </el-form-item>
-          <el-form-item label="密码" prop="pwd">
-            <el-input v-model="registerForm.pwd" type="password" />
-          </el-form-item>
-          <el-form-item label="确认密码" prop="cpwd">
-            <el-input v-model="registerForm.cpwd" type="password" />
-          </el-form-item>
-          <!-- <el-form-item label="验证码" prop="code">
+  <div class="center-form-wrapper">
+    <el-card class="center-form">
+      <el-form
+        ref="formRef"
+        :model="registerForm"
+        :rules="rules"
+        label-width="80px"
+        autocomplete="off"
+      >
+        <h1 class="title">注册</h1>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="registerForm.name" />
+        </el-form-item>
+        <el-form-item label="密码" prop="pwd">
+          <el-input v-model="registerForm.pwd" type="password" />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="cpwd">
+          <el-input v-model="registerForm.cpwd" type="password" />
+        </el-form-item>
+        <!-- <el-form-item label="验证码" prop="code">
             <el-input v-model="registerForm.code" maxlength="4" />
           </el-form-item> -->
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="registerForm.email" />
-            <!-- <el-button size="small" round @click="sendMsg">发送验证码</el-button>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="registerForm.email" />
+          <!-- <el-button size="small" round @click="sendMsg">发送验证码</el-button>
             <span class="status">{{ statusMsg }}</span> -->
-          </el-form-item>
-          <el-form-item label="电话" prop="phone">
-            <el-input v-model="registerForm.phone" />
-          </el-form-item>
-          <el-form-item prop="agreed">
-            <el-checkbox v-model="registerForm.agreed">同意注册协议</el-checkbox>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="submitForm(formRef)">注册</el-button>
-          </el-form-item>
-        </el-form>
-        <div class="login">
-          <span class="bold">已有账号？</span>
-          <span><router-link :to="{ name: 'login' }">登录</router-link></span>
-        </div>
-      </div>
-    </section>
+        </el-form-item>
+        <el-form-item label="电话" prop="phone">
+          <el-input v-model="registerForm.phone" />
+        </el-form-item>
+        <el-form-item prop="agreed">
+          <el-checkbox v-model="registerForm.agreed">同意注册协议</el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click.prevent="submitForm(formRef!)">注册</el-button>
+        </el-form-item>
+        <el-form-item>
+          已有账号？
+          <router-link :underline="false" :to="{ name: 'login' }">登录</router-link>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElNotification } from "element-plus";
+import { register } from "@/api/auth";
 import { encrypt } from "@/utils/rsaEncrypt";
 import type { FormInstance } from "element-plus";
-import axios from "@/utils/request";
+import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 
@@ -130,34 +128,29 @@ const formRef = ref<FormInstance>();
 async function submitForm(formEl: FormInstance) {
   console.log("submit register111");
   await formEl.validate(async (valid, fields) => {
-    console.log("submit register11", valid, fields);
     if (!valid) {
       //return;
     }
     console.log("submit register");
-    try {
-      const res = await axios.post("/auth/register", {
-        username: registerForm.name,
-        password: registerForm.pwd,
-        name: "",
-        phone: registerForm.phone,
-        email: registerForm.email,
-      });
-      console.log("reRegister", res.data);
-      if (res.data.code == 200) {
-        store.commit("login", res.data.result);
-        // let path = route.query.redirect;
-        // if (path) {
-        //   router.replace({ path: path });
-        // } else {
-        //   router.replace({ name: "index" });
-        // }
-        ElMessage({ message: res.data.message, type: "success" });
-      } else {
-        ElMessage({ message: res.data.message, type: "error" });
-      }
-    } catch (e) {
-      //ElMessage({ message: "注册失败，网络连接错误", type: "error" });
+    const res = await register({
+      username: registerForm.name,
+      password: encrypt(registerForm.pwd),
+      name: "",
+      phone: registerForm.phone,
+      email: registerForm.email,
+    });
+    console.log("reRegister", res.data);
+    if (res.data.code == 200) {
+      store.commit("login", res.data.result);
+      // let path = route.query.redirect;
+      // if (path) {
+      //   router.replace({ path: path });
+      // } else {
+      //   router.replace({ name: "index" });
+      // }
+      ElMessage({ message: res.data.message, type: "success" });
+    } else {
+      ElMessage({ message: res.data.message, type: "error" });
     }
   });
 }
