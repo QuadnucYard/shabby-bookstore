@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main-wrapper">
     <el-header class="header">
       <nav-menu></nav-menu>
     </el-header>
@@ -16,6 +16,11 @@ import NavMenu from "@/components/navmenu.vue";
 <style scoped>
 div > span {
   margin: 1em;
+}
+
+.main-wrapper {
+  max-width: 900px;
+  margin: auto;
 }
 
 .main {

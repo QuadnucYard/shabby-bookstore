@@ -13,6 +13,8 @@ import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import axios from "axios";
 import VueAxios from "vue-axios";
 
+axios.defaults.baseURL = "http://localhost:5000/api";
+
 const app = createApp(App);
 app.use(router).use(ElementPlus).use(store);
 app.use(VueAxios, axios);

@@ -9,8 +9,8 @@
         autocomplete="off"
       >
         <h1 class="title">注册</h1>
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="registerForm.name" />
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="registerForm.username" />
         </el-form-item>
         <el-form-item label="密码" prop="pwd">
           <el-input v-model="registerForm.pwd" type="password" />
@@ -28,6 +28,12 @@
         </el-form-item>
         <el-form-item label="电话" prop="phone">
           <el-input v-model="registerForm.phone" />
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="registerForm.name" />
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="registerForm.address" />
         </el-form-item>
         <el-form-item prop="agreed">
           <el-checkbox v-model="registerForm.agreed">同意注册协议</el-checkbox>
@@ -59,12 +65,14 @@ const store = useStore();
 const statusMsg = ref("");
 const error = ref("");
 const registerForm = reactive({
+  username: "",
   name: "",
   code: "",
   pwd: "",
   cpwd: "",
   email: "",
   phone: "",
+  address: "",
   agreed: false,
 });
 const rules = {
@@ -80,7 +88,7 @@ const rules = {
       trigger: "blur",
     },
   ],
-  name: [
+  username: [
     {
       required: true,
       type: "string",
@@ -133,24 +141,25 @@ async function submitForm(formEl: FormInstance) {
     }
     console.log("submit register");
     const res = await register({
-      username: registerForm.name,
+      username: registerForm.username,
       password: encrypt(registerForm.pwd),
-      name: "",
+      name: registerForm.name,
       phone: registerForm.phone,
       email: registerForm.email,
+      address: registerForm.address,
     });
-    console.log("reRegister", res.data);
-    if (res.data.code == 200) {
-      store.commit("login", res.data.result);
+    console.log("reRegister", res);
+    if (res.code == 200) {
+      store.commit("login", res.result);
       // let path = route.query.redirect;
       // if (path) {
       //   router.replace({ path: path });
       // } else {
       //   router.replace({ name: "index" });
       // }
-      ElMessage({ message: res.data.message, type: "success" });
+      ElMessage({ message: res.message, type: "success" });
     } else {
-      ElMessage({ message: res.data.message, type: "error" });
+      ElMessage({ message: res.message, type: "error" });
     }
   });
 }
