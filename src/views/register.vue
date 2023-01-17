@@ -150,7 +150,7 @@ async function submitForm(formEl: FormInstance) {
     });
     console.log("reRegister", res);
     if (res.code == 200) {
-      store.commit("login", res.result);
+      store.commit("login", res.data);
       // let path = route.query.redirect;
       // if (path) {
       //   router.replace({ path: path });

@@ -42,7 +42,7 @@ export default {
   data() {
     return {
       navList: [
-        { name: "/index", navItem: "首页" },
+        { name: "/", navItem: "首页" },
         { name: "/book/list", navItem: "商品列表" },
         { name: "/book/post", navItem: "商品发布" },
         { name: "/cart", navItem: "购物车" },

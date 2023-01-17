@@ -20,7 +20,7 @@
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        <el-form-item label="验证码" prop="code">
+        <!-- <el-form-item label="验证码" prop="code">
           <el-input
             v-model="loginForm.code"
             auto-complete="off"
@@ -31,7 +31,7 @@
           <div class="login-code">
             <img :src="captcha" title="看不清？点击刷新" @click="getCode" alt="" />
           </div>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-checkbox v-model="loginForm.rememberMe"> 记住我 </el-checkbox>
         </el-form-item>
@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
 import { login } from "@/api/auth";
+import { encrypt } from "@/utils/rsaEncrypt";
 import type { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
@@ -59,26 +60,31 @@ const router = useRouter();
 const store = useStore();
 
 const captcha = ref("");
-const cookiePass = ref("");
 const loginForm = reactive({
   username: "",
   password: "",
   rememberMe: false,
   code: "",
 });
+
 const loginRules = reactive({
   username: [{ required: true, trigger: "blur", message: "用户名不能为空" }],
   password: [{ required: true, trigger: "blur", message: "密码不能为空" }],
   code: [{ required: true, trigger: "change", message: "验证码不能为空" }],
 });
-const loading = ref(false);
+
 const redirect = ref<string | null>(null);
 
 const formRef = ref<FormInstance>();
 
+const cookiePass: string | null = null;
+
+const print = console.log;
+
 watch(
   route,
   route => {
+    print(route.query);
     redirect.value = route.query.redirect;
   },
   { immediate: true }
@@ -96,12 +102,11 @@ onMounted(() => {
 function getCode() {
   // captcha = $http.defaults.baseURL + "/kaptcha?d=" + new Date().getTime();
 }
+
 function getCookie() {
   const username = Cookies.get("username");
   const password = Cookies.get("password");
-  const rememberMe = Cookies.get("rememberMe"); // BUG 这个读不到
-  // 保存cookie里面的加密后的密码
-  cookiePass.value = password ?? "";
+  const rememberMe = Cookies.get("rememberMe");
   Object.assign(loginForm, {
     username: username ?? loginForm.username,
     password: password ?? loginForm.password,
@@ -109,6 +114,7 @@ function getCookie() {
     code: "",
   });
 }
+
 async function handleLogin(formEl: FormInstance) {
   await formEl.validate(async valid => {
     console.log("handleLogin valid ?", valid);
@@ -118,15 +124,10 @@ async function handleLogin(formEl: FormInstance) {
       rememberMe: loginForm.rememberMe,
       code: loginForm.code,
     };
-    // 加密不是一一映射的……前端搞一下后端就出事了
-    /* if (user.password !== this.cookiePass) {
-      user.password = encrypt(user.password);
-    } */
     if (!valid) {
       ElMessage.error("登录信息不合法");
       return;
     }
-    //this.loading = true;
     if (user.rememberMe) {
       Cookies.set("username", user.username, { expires: 7 });
       Cookies.set("password", user.password, { expires: 7 });
@@ -136,26 +137,21 @@ async function handleLogin(formEl: FormInstance) {
       Cookies.remove("password");
       Cookies.remove("rememberMe");
     }
-    console.log("store", store.state);
+    user.password = encrypt(user.password);
     const res = await login(user);
     console.log("reLogin", res.data);
-    if (res.data.code == 200) {
-      store.commit("login", res.data.result);
-      router.replace({ path: redirect.value ?? "/" });
-      ElMessage({
-        message: res.data.message,
-        type: "success",
-      });
-      return true;
-    } else {
-      ElMessage({
-        message: res.data.message,
-        type: "error",
-      });
+    if (res.code != 200) {
+      ElMessage.error(res.message);
+      return false;
     }
-    return false;
+    store.commit("login", user);
+    print(store.state);
+    router.replace({ path: redirect.value ?? "/" });
+    ElMessage.success(res.message);
+    return true;
   });
 }
+
 function point() {
   const point = Cookies.get("point");
   if (point) {

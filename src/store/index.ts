@@ -2,10 +2,9 @@ import { createStore } from "vuex";
 
 export default createStore({
   state: {
-    user:
-      window.localStorage.getItem("user") == null
-        ? null
-        : JSON.parse(window.localStorage.getItem("user")),
+    user: window.localStorage.getItem("user")
+      ? JSON.parse(window.localStorage.getItem("user")!)
+      : null,
     adminMenus: [],
   },
   mutations: {
