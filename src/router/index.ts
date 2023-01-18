@@ -33,6 +33,14 @@ const routes: Array<RouteRecordRaw> = [
           keepalive: false,
         },
       },
+      {
+        path: "/book/detail",
+        name: "bookdetail",
+        component: () => import("@/views/bookdetail.vue"),
+        meta: {
+          keepalive: false,
+        },
+      },
     ],
   },
 ];
