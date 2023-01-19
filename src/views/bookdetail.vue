@@ -1,25 +1,25 @@
 <template>
   <div>
-    <div class="book-intro">
+    <div class="book-intro" v-if="book">
       <el-row :gutter="20">
         <el-col :span="8">
           <div class="preview-wrap">
-            <el-image :src="intro.cover" :alt="intro.name" fit="contain" />
+            <el-image :src="book.cover" :alt="book.name" fit="contain" />
           </div>
         </el-col>
         <el-col :span="16">
           <div class="item-info-wrap">
-            <div class="title">{{ intro.name }}</div>
-            <v-md-preview class="desc" :text="intro.desc" />
+            <div class="title">{{ book.name }}</div>
+            <v-md-preview class="desc" :text="book.desc" />
             <div class="info">
               <div>
-                <span class="t1">作者：{{ intro.author }}</span>
-                <span class="t1">出版社：{{ intro.publisher }}</span>
-                <span class="t1">出版日期：{{ intro.publishDate }}</span>
+                <span class="t1">作者：{{ book.author }}</span>
+                <span class="t1">出版社：{{ book.publisher }}</span>
+                <span class="t1">出版日期：{{ book.publishDate }}</span>
               </div>
               <div>
-                <el-rate class="t1" v-model="intro.rating" disabled />
-                <span class="t1">{{ intro.numComments }}条评论</span>
+                <el-rate class="t1" v-model="book.rating" disabled />
+                <span class="t1">{{ book.numComments }}条评论</span>
               </div>
             </div>
             <div class="price-info-wrap">
@@ -28,12 +28,12 @@
                 <div class="dd">
                   <span class="price">
                     <span> ￥</span>
-                    <span> {{ intro.price.toFixed(2) }}</span>
-                    <span> ({{ (intro.price / intro.originalPrice).toFixed(2) }}折)</span>
+                    <span> {{ book.price.toFixed(2) }}</span>
+                    <span> ({{ (book.price / book.originalPrice).toFixed(2) }}折)</span>
                   </span>
                   <span class="price-m">
                     定价
-                    <span>￥{{ intro.originalPrice.toFixed(2) }}</span>
+                    <span>￥{{ book.originalPrice.toFixed(2) }}</span>
                   </span>
                 </div>
               </div>
@@ -59,12 +59,12 @@
             <div class="user-column">
               <div class="user-info">
                 <el-avatar :size="30" :icon="UserFilled" style="vertical-align: center" />
-                {{ item.user }}
+                {{ item.uname }}
               </div>
             </div>
             <div class="comment-column">
               <el-rate v-model="item.rating" disabled />
-              <v-md-preview :text="item.text" />
+              <v-md-preview :text="item.content" />
               <div class="comment-message">
                 <div class="comment-op">
                   <el-link :underline="false" class="op-nice" @click="report">
@@ -84,43 +84,26 @@
 
 <script setup lang="ts">
 import { UserFilled } from "@element-plus/icons-vue";
+import { BookInfo, Comment,getBook, getComments } from "@/api/book";
 
-const intro = reactive({
-  bid: 1,
-  name: "东野圭吾新作：魔力的胎动",
-  desc: "喜欢《解忧杂货店》，就一定要读这本书。珍藏印签。有了想要守护的东西，生命就会变得有力量。悲凉的人生、千疮百孔的命运、一桩桩悲剧的发生与救赎，读来令人喟叹不已。",
-  author: "东野圭吾",
-  publisher: "北京联合出版有限公司",
-  publishDate: "2019年12月",
-  rating: 4.8,
-  numComments: 19909,
-  price: 32.4,
-  originalPrice: 45.0,
-  cover: "https://img3m4.ddimg.cn/68/35/28484744-5_u_15.jpg",
-});
+const $route = useRoute();
+const $router = useRouter();
 
-const comments = reactive([
-  {
-    user: "someone",
-    rating: 4,
-    time: new Date(),
-    text: "这是**一条**一条~~评论~~\n24556\n\n765645343",
-    likes: 13,
-  },
-  {
-    user: "someone",
-    rating: 4,
-    time: new Date(),
-    text: `很好！$66666$`,
-    likes: 13,
-  },
-]);
+const book = ref< BookInfo | null>(null);
+
+const comments = ref<Comment[]>([]);
 
 const print = console.log;
 
 const report = () => {
   print("report");
 };
+
+onMounted(async () => {
+  const bid = Number.parseInt($route.params.bid);
+  book.value = await getBook(bid);
+  comments.value = await getComments(bid);
+});
 </script>
 
 <style lang="scss">

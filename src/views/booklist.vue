@@ -155,7 +155,7 @@ const addToFavorites = (bid: number) => {
 
 const handleSizeChange = async (value: number) => await refreshList(1, value, queryOptions);
 const handleCurrentChange = async (value: number) =>
-  await refreshList(value, goodsList.value.pageSize, queryOptions);
+  await refreshList(value, goodsList.pageSize, queryOptions);
 </script>
 
 <style lang="scss">
