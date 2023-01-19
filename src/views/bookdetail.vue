@@ -1,5 +1,6 @@
 <template>
   <div>
+    <SearchBox />
     <div class="book-intro" v-if="book">
       <el-row :gutter="20">
         <el-col :span="8">

@@ -1,38 +1,6 @@
 <template>
   <div>
-    <div class="search-box">
-      <el-form :inline="true" v-model="queryOptions">
-        <el-form-item style="width: 690px">
-          <el-input v-model="queryOptions.keyword" placeholder="搜索书籍" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="onSubmitQuery" style="width: 60px">
-            搜索
-          </el-button>
-        </el-form-item>
-      </el-form>
-      <el-collapse>
-        <el-collapse-item title="高级搜索">
-          <el-form label-width="100px" style="max-width: 500px" size="small">
-            <el-form-item label="名称">
-              <el-input v-model="queryOptions.name" placeholder="" />
-            </el-form-item>
-            <el-form-item label="作者">
-              <el-input v-model="queryOptions.author" placeholder="" />
-            </el-form-item>
-            <el-form-item label="出版社">
-              <el-input v-model="queryOptions.publisher" placeholder="" />
-            </el-form-item>
-            <el-form-item label="描述">
-              <el-input v-model="queryOptions.desc" placeholder="" />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSubmitQueryAdvanced">查询</el-button>
-            </el-form-item>
-          </el-form>
-        </el-collapse-item>
-      </el-collapse>
-    </div>
+    <SearchBox ref="searchBox"/>
     <div class="tools-box">
       <div style="float: right">
         <el-switch v-model="listMode" active-text="列表" inactive-text="大图" />
@@ -98,15 +66,16 @@
 </template>
 
 <script setup lang="ts">
-import { Search } from "@element-plus/icons-vue";
 import { QueryOptions, PagedBookList, getBookList } from "@/api/book";
 import _ from "lodash";
 import { LocationQuery, onBeforeRouteUpdate } from "vue-router";
+import SearchBox from "@/components/SearchBox.vue";
 
 const $route = useRoute();
 const $router = useRouter();
 
-const queryOptions = reactive<QueryOptions>({});
+const searchBox = ref(null);
+
 const listMode = ref(false); // false = grid, true = list
 const goodsList = reactive<PagedBookList>({
   page: 0,
@@ -116,34 +85,27 @@ const goodsList = reactive<PagedBookList>({
   items: [],
 });
 
+const queryOptions: QueryOptions = {}; 
+
 const setupList = async (query: LocationQuery) => {
   const page = query.page ? Number.parseInt(query.page as string) : 1;
   const pageSize = Number.parseInt((query.pageSize as string) ?? "20");
   Object.assign(queryOptions, {
-    keyword: query.keyword ?? "",
-    name: query.name ?? "",
-    author: query.author ?? "",
-    publisher: query.publisher ?? "",
-    desc: query.desc ?? "",
+    keyword: query.keyword as string ?? "",
+    name: query.name as string ?? "",
+    author: query.author as string ?? "",
+    publisher: query.publisher as string ?? "",
+    desc: query.desc as string ?? "",
   });
-  console.log(page, pageSize, queryOptions);
   Object.assign(goodsList, await getBookList(page, pageSize, queryOptions));
 };
 
 onMounted(async () => await setupList($route.query));
 onBeforeRouteUpdate(async to => await setupList(to.query));
 
-const refreshList = async (page: number, pageSize: number, options: QueryOptions) => {
-  const query = _.pickBy({ page, pageSize, ...options });
+const refreshList = async (page: number, pageSize: number) => {
+  const query = _.pickBy({ page, pageSize, ...queryOptions });
   $router.push({ name: $route.name!, query });
-};
-
-const onSubmitQuery = async () => {
-  await refreshList(1, goodsList.pageSize, { keyword: queryOptions.keyword });
-};
-
-const onSubmitQueryAdvanced = async () => {
-  await refreshList(1, goodsList.pageSize, _.omit(queryOptions, "keyword"));
 };
 
 const addToCart = (bid: number) => {
@@ -153,22 +115,12 @@ const addToFavorites = (bid: number) => {
   console.log(bid);
 };
 
-const handleSizeChange = async (value: number) => await refreshList(1, value, queryOptions);
+const handleSizeChange = async (value: number) => await refreshList(1, value);
 const handleCurrentChange = async (value: number) =>
-  await refreshList(value, goodsList.pageSize, queryOptions);
+  await refreshList(value, goodsList.pageSize);
 </script>
 
 <style lang="scss">
-.search-box {
-  padding: 20px;
-  .el-form-item {
-    margin-bottom: 8px;
-  }
-  .el-collapse-item__header {
-    height: 40px;
-  }
-}
-
 .tools-box {
   background-color: #ecf5ff;
   font-size: x-small;
