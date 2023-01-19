@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/book/detail",
+        path: "/book/:bid(\\d+)",
         name: "bookdetail",
         component: () => import("@/views/bookdetail.vue"),
         meta: {

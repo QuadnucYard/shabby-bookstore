@@ -4,12 +4,12 @@
       <el-row :gutter="20">
         <el-col :span="8">
           <div class="preview-wrap">
-            <el-image :src="intro.cover" :alt="intro.title" fit="contain" />
+            <el-image :src="intro.cover" :alt="intro.name" fit="contain" />
           </div>
         </el-col>
         <el-col :span="16">
           <div class="item-info-wrap">
-            <div class="title">{{ intro.title }}</div>
+            <div class="title">{{ intro.name }}</div>
             <v-md-preview class="desc" :text="intro.desc" />
             <div class="info">
               <div>
@@ -28,7 +28,12 @@
                 <div class="dd">
                   <span class="price">
                     <span> ￥</span>
-                    <span> {{ intro.price }}</span>
+                    <span> {{ intro.price.toFixed(2) }}</span>
+                    <span> ({{ (intro.price / intro.originalPrice).toFixed(2) }}折)</span>
+                  </span>
+                  <span class="price-m">
+                    定价
+                    <span>￥{{ intro.originalPrice.toFixed(2) }}</span>
                   </span>
                 </div>
               </div>
@@ -37,7 +42,7 @@
                 <div class="dd">
                   <div class="prom-item">
                     <span class="hl_red_bg">满减</span>
-                    <span class="hl_red">每满39元，可减10元现金，最多可减1000元</span>
+                    <span class="hl_red">每满99元，可减100元现金，最多可减9元</span>
                   </div>
                 </div>
               </div>
@@ -81,7 +86,8 @@
 import { UserFilled } from "@element-plus/icons-vue";
 
 const intro = reactive({
-  title: "东野圭吾新作：魔力的胎动",
+  bid: 1,
+  name: "东野圭吾新作：魔力的胎动",
   desc: "喜欢《解忧杂货店》，就一定要读这本书。珍藏印签。有了想要守护的东西，生命就会变得有力量。悲凉的人生、千疮百孔的命运、一桩桩悲剧的发生与救赎，读来令人喟叹不已。",
   author: "东野圭吾",
   publisher: "北京联合出版有限公司",
@@ -89,6 +95,7 @@ const intro = reactive({
   rating: 4.8,
   numComments: 19909,
   price: 32.4,
+  originalPrice: 45.0,
   cover: "https://img3m4.ddimg.cn/68/35/28484744-5_u_15.jpg",
 });
 
@@ -141,7 +148,7 @@ const report = () => {
       background-color: #f7f8fc;
       color: #999;
       font-size: small;
-      vertical-align: center;
+      vertical-align: middle;
       padding: 10px 0 10px 0;
       > div {
         margin-bottom: 10px;
@@ -155,18 +162,30 @@ const report = () => {
       }
       .dd {
         margin-left: 75px;
+        vertical-align: middle;
       }
       .price {
         color: #e4393c;
         line-height: 18px;
+        vertical-align: middle;
         span:nth-child(1) {
           font-size: large;
         }
         span:nth-child(2) {
           font-size: x-large;
         }
+        span:nth-child(3) {
+          margin-left: 0.5em;
+        }
+      }
+      .price-m {
+        margin-left: 2em;
+        span {
+          text-decoration: line-through;
+        }
       }
       .prom-item {
+        vertical-align: middle;
         .hl_red_bg {
           color: #df3033;
           background: 0 0;
