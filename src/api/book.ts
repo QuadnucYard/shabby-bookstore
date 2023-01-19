@@ -1,3 +1,5 @@
+import axios from "@/utils/request";
+
 export interface BookInfo {
   bid: number;
   name: string;
@@ -12,7 +14,7 @@ export interface BookInfo {
   cover: string;
 }
 
-interface QueryOptions {
+export interface QueryOptions {
   keyword?: string;
   name?: string;
   author?: string;
@@ -20,8 +22,21 @@ interface QueryOptions {
   desc?: string;
 }
 
-export function getBookList(page: number, options: QueryOptions): BookInfo[] {
-  return Array(5).fill({
+export interface PagedBookList {
+  items: BookInfo[];
+  page: number;
+  pages: number;
+  total: number;
+  pageSize: number;
+}
+
+export async function getBookList(
+  page: number,
+  pageSize: number,
+  options: QueryOptions
+): Promise<PagedBookList> {
+  return (await axios.get("/book/list", { params: { page, pageSize, ...options } })).data.data;
+  /* return Array(5).fill({
     bid: 1,
     name: "东野圭吾新作：魔力的胎动",
     desc: "喜欢《解忧杂货店》，就一定要读这本书。珍藏印签。有了想要守护的东西，生命就会变得有力量。悲凉的人生、千疮百孔的命运、一桩桩悲剧的发生与救赎，读来令人喟叹不已。",
@@ -33,5 +48,5 @@ export function getBookList(page: number, options: QueryOptions): BookInfo[] {
     price: 32.4,
     originalPrice: 45.0,
     cover: "https://img3m4.ddimg.cn/68/35/28484744-5_u_15.jpg",
-  });
+  }); */
 }
