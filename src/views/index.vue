@@ -19,7 +19,7 @@ div > span {
 }
 
 .main-wrapper {
-  max-width: 900px;
+  max-width: 960px;
   margin: auto;
 }
 

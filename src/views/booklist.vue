@@ -1,11 +1,11 @@
 <template>
   <div>
     <SearchBox ref="searchBox"/>
-    <div class="tools-box">
+    <!-- <div class="tools-box">
       <div style="float: right">
         <el-switch v-model="listMode" active-text="列表" inactive-text="大图" />
       </div>
-    </div>
+    </div> -->
     <div class="goods-list">
       <template v-for="item in goodsList.items" :key="item.bid">
         <div class="goods-item">

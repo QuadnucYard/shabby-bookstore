@@ -48,6 +48,11 @@
                 </div>
               </div>
             </div>
+            <div class="buy-box">
+              <el-input-number v-model="buyCount" :min="1" controls-position="right" />
+              <el-button type="primary" :icon="ShoppingCart" color="#E53935">加入购物车</el-button>
+              <el-button type="primary" :icon="StarFilled" color="#D81B60">加入收藏</el-button>
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -84,13 +89,15 @@
 </template>
 
 <script setup lang="ts">
-import { UserFilled } from "@element-plus/icons-vue";
-import { BookInfo, Comment,getBook, getComments } from "@/api/book";
+import { UserFilled, ShoppingCart, StarFilled } from "@element-plus/icons-vue";
+import { BookInfo, Comment, getBook, getComments } from "@/api/book";
 
 const $route = useRoute();
 const $router = useRouter();
 
-const book = ref< BookInfo | null>(null);
+const book = ref<BookInfo | null>(null);
+
+const buyCount = ref(1);
 
 const comments = ref<Comment[]>([]);
 
@@ -183,6 +190,16 @@ onMounted(async () => {
           color: #666;
           line-height: 18px;
         }
+      }
+    }
+    .buy-box {
+      margin-top: 10px;
+      .el-input-number {
+        width: 80px;
+        margin-right: 20px;
+      }
+      .el-button {
+        width: 120px;
       }
     }
   }
