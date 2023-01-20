@@ -52,12 +52,10 @@ import { encrypt } from "@/utils/rsaEncrypt";
 import type { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
-import { useRoute, useRouter } from "vue-router";
-import { useStore } from "vuex";
 
-const route = useRoute();
-const router = useRouter();
-const store = useStore();
+const $route = useRoute();
+const $router = useRouter();
+const $store = useStore();
 
 const captcha = ref("");
 const loginForm = reactive({
@@ -77,12 +75,10 @@ const redirect = ref<string | null>(null);
 
 const formRef = ref<FormInstance>();
 
-const cookiePass: string | null = null;
-
 const print = console.log;
 
 watch(
-  route,
+  $route,
   route => {
     print(route.query);
     redirect.value = route.query.redirect;
@@ -144,9 +140,9 @@ async function handleLogin(formEl: FormInstance) {
       ElMessage.error(res.message);
       return false;
     }
-    store.commit("login", user);
-    print(store.state);
-    router.replace({ path: redirect.value ?? "/" });
+    $store.commit("login", res.data);
+    print($store.state);
+    $router.replace({ path: redirect.value ?? "/" });
     ElMessage.success(res.message);
     return true;
   });

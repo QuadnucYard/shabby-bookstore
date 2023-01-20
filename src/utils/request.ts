@@ -8,8 +8,10 @@ import Cookies from "js-cookie";
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: axios.defaults.baseURL, // api 的 base_url
+  baseURL: "http://localhost:5000/api",
   timeout: 5000, // 请求超时时间
+  withCredentials: true,
+  headers: { "Access-Control-Allow-Origin": "*" },
 });
 
 // request拦截器
@@ -33,9 +35,7 @@ service.interceptors.response.use(
   response => {
     const code = response.status;
     if (code < 200 || code > 300) {
-      ElMessage.error({
-        title: response.message,
-      });
+      ElMessage.error(response.message);
       return Promise.reject("error");
     } else {
       return response;

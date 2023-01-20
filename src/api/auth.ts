@@ -7,3 +7,11 @@ export async function register(user: any) {
 export async function login(user: { username: string; password: string }) {
   return (await axios.post("/auth/login", user)).data;
 }
+
+export async function logout() {
+  return await axios.get("/auth/logout");
+}
+
+export async function auth() {
+  return await axios.get("/auth");
+}

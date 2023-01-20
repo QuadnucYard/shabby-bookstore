@@ -10,11 +10,6 @@ import "./styles/index.scss";
 
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 
-import axios from "axios";
-import VueAxios from "vue-axios";
-
-axios.defaults.baseURL = "http://localhost:5000/api";
-
 import VMdPreview from "@kangc/v-md-editor/lib/preview";
 import "@kangc/v-md-editor/lib/style/preview.css";
 import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
@@ -28,7 +23,6 @@ VMdPreview.use(githubTheme, {
 
 const app = createApp(App);
 app.use(router).use(ElementPlus).use(store);
-app.use(VueAxios, axios);
 app.use(VMdPreview);
 console.log(app);
 
