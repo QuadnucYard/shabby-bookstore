@@ -38,7 +38,7 @@
           <div class="placer"></div>
           <div class="bottom">
             <div class="shop-button">
-              <a @click="addToCart(item.bid)" href="javascript:void(0);">
+              <a @click="addToCartHandler(item.bid)" href="javascript:void(0);">
                 <el-icon><ShoppingCart /></el-icon> 加入购物车
               </a>
               <a @click="addToFavorites(item.bid)" href="javascript:void(0);">
@@ -66,10 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { QueryOptions, PagedBookList, getBookList } from "@/api/book";
 import _ from "lodash";
 import { LocationQuery, onBeforeRouteUpdate } from "vue-router";
 import SearchBox from "@/components/SearchBox.vue";
+import { QueryOptions, PagedBookList, getBookList } from "@/api/book";
+import { addToCart } from "@/api/order";
+import { ElMessage } from "element-plus";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -108,8 +110,9 @@ const refreshList = async (page: number, pageSize: number) => {
   $router.push({ name: $route.name!, query });
 };
 
-const addToCart = (bid: number) => {
-  console.log(bid);
+const addToCartHandler =async (bid: number) => {
+  const result = await addToCart(bid, 1);
+  ElMessage.success(result.message);
 };
 const addToFavorites = (bid: number) => {
   console.log(bid);

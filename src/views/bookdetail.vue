@@ -50,7 +50,7 @@
             </div>
             <div class="buy-box">
               <el-input-number v-model="buyCount" :min="1" controls-position="right" />
-              <el-button type="primary" :icon="ShoppingCart" color="#E53935">加入购物车</el-button>
+              <el-button type="primary" :icon="ShoppingCart" color="#E53935" @click="addToCartHandler">加入购物车</el-button>
               <el-button type="primary" :icon="StarFilled" color="#D81B60">加入收藏</el-button>
             </div>
           </div>
@@ -91,6 +91,8 @@
 <script setup lang="ts">
 import { UserFilled, ShoppingCart, StarFilled } from "@element-plus/icons-vue";
 import { BookInfo, Comment, getBook, getComments } from "@/api/book";
+import { addToCart } from "@/api/order";
+import { ElMessage } from "element-plus";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -108,10 +110,17 @@ const report = () => {
 };
 
 onMounted(async () => {
-  const bid = Number.parseInt($route.params.bid);
+  const bid = Number.parseInt($route.params.bid as string);
   book.value = await getBook(bid);
   comments.value = await getComments(bid);
 });
+
+const addToCartHandler = async () => {
+  const bid = Number.parseInt($route.params.bid as string);
+  const result = await addToCart(bid, buyCount.value);
+  ElMessage.success(result.message);
+  $router.push({ name: "shopping_cart" });
+};
 </script>
 
 <style lang="scss">
