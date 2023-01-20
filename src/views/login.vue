@@ -131,7 +131,7 @@ async function handleLogin(formEl: FormInstance) {
     }
     $store.commit("login", res.data);
     print($store.state);
-    $router.replace({ path: $route.query.redirect as string ?? "" });
+    $router.replace({ path: $route.query.redirect as string ?? "/" });
     ElMessage.success(res.message);
     return true;
   });
@@ -144,6 +144,8 @@ function point() {
     Cookies.remove("point");
   }
 }
+
+// 这里应该检查一下，如果用户已登录，跳转
 </script>
 
 <style lang="scss" scoped>

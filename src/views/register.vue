@@ -62,8 +62,6 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 
-const statusMsg = ref("");
-const error = ref("");
 const registerForm = reactive({
   username: "",
   name: "",
@@ -151,15 +149,10 @@ async function submitForm(formEl: FormInstance) {
     console.log("reRegister", res);
     if (res.code == 200) {
       store.commit("login", res.data);
-      // let path = route.query.redirect;
-      // if (path) {
-      //   router.replace({ path: path });
-      // } else {
-      //   router.replace({ name: "index" });
-      // }
-      ElMessage({ message: res.message, type: "success" });
+      router.replace({ path: (route.query.redirect as string) ?? "/" });
+      ElMessage.success(res.message);
     } else {
-      ElMessage({ message: res.message, type: "error" });
+      ElMessage.error(res.message);
     }
   });
 }

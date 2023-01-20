@@ -42,6 +42,7 @@
 import { logout } from "@/api/auth";
 import { ElMessage } from "element-plus";
 import { HomeFilled, Shop, ShoppingCart, UserFilled } from "@element-plus/icons-vue";
+import { auth } from "@/api/auth";
 
 const $router = useRouter();
 const $store = useStore();
@@ -52,13 +53,30 @@ const navList = [
   { name: "/shopping_cart", navItem: "购物车", comp: ShoppingCart },
 ];
 
+onMounted(async () => {
+  if ($store.state.user) {
+    try {
+      await auth();
+    } catch (e) {
+      ElMessage.warning("当前用户登录状态已过期，请重新登录");
+      $store.commit("logout");
+      $router.push({ name: "home" });
+    }
+  }
+});
+
 const username = computed(() => $store.state.user?.uname);
 
 const logoutHandler = async () => {
-  await logout();
+  try {
+    await logout();
+    ElMessage.success("成功注销");
+  } catch (e) {
+    console.error(e);
+    ElMessage.warning("注销异常，但是成功了");
+  }
   $store.commit("logout");
   $router.push({ name: "home" });
-  ElMessage.success("成功注销");
 };
 
 const toHome = () => {
