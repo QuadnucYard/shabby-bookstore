@@ -31,3 +31,26 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 app.mount("#app");
+
+import axios from "@/utils/request";
+
+router.beforeEach((to, from, next) => {
+  console.log("beforeEach", to.meta.requireAuth);
+  /* if (store.state.user && to.path.startsWith("/admin")) {
+    initAdminMenu(router, store);
+  } */
+  if (to.meta.requireAuth) {
+    if (store.state.user) {
+      axios.get("/auth").then(resp => {
+        if (resp) next();
+      });
+    } else {
+      next({
+        name: "login",
+        query: { redirect: to.fullPath },
+      });
+    }
+  } else {
+    next();
+  }
+});

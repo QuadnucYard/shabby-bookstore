@@ -71,20 +71,9 @@ const loginRules = reactive({
   code: [{ required: true, trigger: "change", message: "验证码不能为空" }],
 });
 
-const redirect = ref<string | null>(null);
-
 const formRef = ref<FormInstance>();
 
 const print = console.log;
-
-watch(
-  $route,
-  route => {
-    print(route.query);
-    redirect.value = route.query.redirect;
-  },
-  { immediate: true }
-);
 
 onMounted(() => {
   // 获取验证码
@@ -142,7 +131,7 @@ async function handleLogin(formEl: FormInstance) {
     }
     $store.commit("login", res.data);
     print($store.state);
-    $router.replace({ path: redirect.value ?? "/" });
+    $router.replace({ path: $route.query.redirect as string ?? "" });
     ElMessage.success(res.message);
     return true;
   });

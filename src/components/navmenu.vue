@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-menu
-      :default-active="'/index'"
+      :default-active="'/'"
       router
       mode="horizontal"
       background-color="white"
@@ -49,7 +49,7 @@ const $store = useStore();
 const navList = [
   { name: "/", navItem: "首页", comp: HomeFilled },
   { name: "/book/list", navItem: "商品列表", comp: Shop },
-  { name: "/cart", navItem: "购物车", comp: ShoppingCart },
+  { name: "/shopping_cart", navItem: "购物车", comp: ShoppingCart },
 ];
 
 const username = computed(() => $store.state.user?.uname);
@@ -57,6 +57,7 @@ const username = computed(() => $store.state.user?.uname);
 const logoutHandler = async () => {
   await logout();
   $store.commit("logout");
+  $router.push({ name: "home" });
   ElMessage.success("成功注销");
 };
 

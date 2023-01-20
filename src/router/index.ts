@@ -36,6 +36,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/bookdetail.vue"),
         meta: { keepalive: false },
       },
+      {
+        path: "/shopping_cart",
+        name: "shopping_cart",
+        component: () => import("@/views/shopping_cart.vue"),
+        meta: { keepalive: false, requireAuth: true },
+      },
+      {
+        path: "/:pathMatch(.*)",
+        name: "error",
+        component: () => import("@/views/pages/Error404.vue"),
+        alias: "/notfound",
+      },
     ],
   },
 ];
