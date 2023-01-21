@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { logout } from "@/api/auth";
 import { ElMessage } from "element-plus";
-import { HomeFilled, Shop, ShoppingCart, UserFilled } from "@element-plus/icons-vue";
+import { HomeFilled, Shop, StarFilled, ShoppingCart, UserFilled } from "@element-plus/icons-vue";
 import { auth } from "@/api/auth";
 
 const $router = useRouter();
@@ -50,6 +50,7 @@ const $store = useStore();
 const navList = [
   { name: "/", navItem: "首页", comp: HomeFilled },
   { name: "/book/list", navItem: "商品列表", comp: Shop },
+  { name: "/favorites", navItem: "收藏夹", comp: StarFilled },
   { name: "/shopping_cart", navItem: "购物车", comp: ShoppingCart },
 ];
 

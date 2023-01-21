@@ -37,6 +37,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { keepalive: false },
       },
       {
+        path: "/favorites",
+        name: "favorites",
+        component: () => import("@/views/favorites.vue"),
+        meta: { keepalive: false, requireAuth: true },
+      },
+      {
         path: "/shopping_cart",
         name: "shopping_cart",
         component: () => import("@/views/shopping_cart.vue"),

@@ -16,7 +16,7 @@
               <el-image :src="scope.row.cover" style="width: 80px; height: 80px" fit="contain" />
             </template>
           </el-table-column>
-          <el-table-column width="400" label="商品信息">
+          <el-table-column width="380" label="商品信息">
             <template #default="scope">
               <el-link>{{ scope.row.name }}</el-link>
             </template>
@@ -36,9 +36,10 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column width="60" label="操作" align="center">
+          <el-table-column width="80" label="操作" align="center">
             <template #default="scope">
-              <el-link @click="onRemoveFromCart(scope.row.bid)"> 删除</el-link>
+              <el-link @click="onRemoveFromCart(scope.row.bid)">删除</el-link>
+              <el-link @click="onMoveToFavorites(scope.row.bid)">移入收藏</el-link>
             </template>
           </el-table-column>
         </el-table>
@@ -48,20 +49,24 @@
       <div class="left">
         <el-checkbox v-model="checkAll" label="全选" size="small" @change="onCheckAll" />
         <el-link class="fn-batch-remove" @click="onRemoveFromCart()">批量删除</el-link>
+        <el-link class="fn-batch-move" @click="onMoveToFavorites()">批量移入收藏</el-link>
       </div>
       <div class="right">
         <span>总计(不含运费)：</span>
         <span class="price">￥{{ totalPrice.toFixed(2) }}</span>
-        <el-button type="primary" class="fn-checkout" @click="onCreateOrder">结算</el-button>
+        <el-button type="primary" class="fn-checkout" color="#E65100" @click="onCreateOrder"
+          >结算</el-button
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getShoppingCart, removeFromCart, createOrder } from "@/api/order";
+import { getShoppingCart, removeFromCart, createOrder, moveToFavorites } from "@/api/order";
 import { ElMessage } from "element-plus";
 import _ from "lodash";
+import "@/utils/array-extensions";
 
 const checkAll = ref(true);
 
@@ -98,17 +103,25 @@ const onCheckAll = (value: any) => {
   tableData.value.forEach(t => (t.checked = value));
 };
 
-const onRemoveFromCart = async (bid?: number) => {
-  const result = await removeFromCart(bid ?? checkedBids.value);
-  ElMessage.success(result.message);
+const smartRemove = (bid?: number) => {
+  console.log("smartRemove", bid, tableData.value.findIndex(t => t.bid == bid));
   if (bid) {
-    tableData.value.splice(
-      tableData.value.findIndex(t => t.bid == bid),
-      1
-    );
+    tableData.value.removeAt(tableData.value.findIndex(t => t.bid == bid));
   } else {
     tableData.value = tableData.value.filter(t => !t.checked);
   }
+};
+
+const onRemoveFromCart = async (bid?: number) => {
+  const result = await removeFromCart(bid ?? checkedBids.value);
+  ElMessage.success(result.message);
+  smartRemove(bid);
+};
+
+const onMoveToFavorites = async (bid?: number) => {
+  await moveToFavorites(bid ?? checkedBids.value);
+  ElMessage.success("成功移入收藏夹");
+  smartRemove(bid);
 };
 
 const onCreateOrder = async () => {
@@ -149,7 +162,8 @@ const onCreateOrder = async () => {
     }
     .left {
       margin-left: 1em;
-      .fn-batch-remove {
+      .fn-batch-remove,
+      .fn-batch-move {
         margin-left: 2em;
       }
     }

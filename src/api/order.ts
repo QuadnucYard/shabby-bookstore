@@ -19,6 +19,11 @@ export async function removeFromCart(bid: number | number[]) {
   return (await axios.post("/shopping_cart/remove", { bids })).data;
 }
 
+export async function moveToFavorites(bid: number | number[]) {
+  const bids = typeof bid === "number" ? [bid] : bid;
+  return (await axios.post("/shopping_cart/move", { bids })).data;
+}
+
 export async function createOrder(bids: number[]) {
   return (await axios.post("/order/create", { bids })).data;
 }

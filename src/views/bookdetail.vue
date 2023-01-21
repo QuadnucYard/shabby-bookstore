@@ -50,8 +50,22 @@
             </div>
             <div class="buy-box">
               <el-input-number v-model="buyCount" :min="1" controls-position="right" />
-              <el-button type="primary" :icon="ShoppingCart" color="#E53935" @click="addToCartHandler">加入购物车</el-button>
-              <el-button type="primary" :icon="StarFilled" color="#D81B60">加入收藏</el-button>
+              <el-button
+                type="primary"
+                :icon="ShoppingCart"
+                color="#E53935"
+                @click="addToCartHandler"
+              >
+                加入购物车
+              </el-button>
+              <el-button
+                type="primary"
+                :icon="StarFilled"
+                color="#D81B60"
+                @click="addToFavoritesHandler"
+              >
+                加入收藏
+              </el-button>
             </div>
           </div>
         </el-col>
@@ -93,6 +107,7 @@ import { UserFilled, ShoppingCart, StarFilled } from "@element-plus/icons-vue";
 import { BookInfo, Comment, getBook, getComments } from "@/api/book";
 import { addToCart } from "@/api/order";
 import { ElMessage } from "element-plus";
+import { addToFavorites } from "@/api/favorites";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -109,17 +124,22 @@ const report = () => {
   print("report");
 };
 
+const bid = computed(() => Number.parseInt($route.params.bid as string));
+
 onMounted(async () => {
-  const bid = Number.parseInt($route.params.bid as string);
-  book.value = await getBook(bid);
-  comments.value = await getComments(bid);
+  book.value = await getBook(bid.value);
+  comments.value = await getComments(bid.value);
 });
 
 const addToCartHandler = async () => {
-  const bid = Number.parseInt($route.params.bid as string);
-  const result = await addToCart(bid, buyCount.value);
+  const result = await addToCart(bid.value, buyCount.value);
   ElMessage.success(result.message);
   $router.push({ name: "shopping_cart" });
+};
+
+const addToFavoritesHandler = async () => {
+  const result = await addToFavorites(bid.value);
+  ElMessage.success(result.message);
 };
 </script>
 

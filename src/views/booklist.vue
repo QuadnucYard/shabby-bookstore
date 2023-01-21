@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SearchBox ref="searchBox"/>
+    <SearchBox ref="searchBox" />
     <!-- <div class="tools-box">
       <div style="float: right">
         <el-switch v-model="listMode" active-text="列表" inactive-text="大图" />
@@ -41,7 +41,7 @@
               <a @click="addToCartHandler(item.bid)" href="javascript:void(0);">
                 <el-icon><ShoppingCart /></el-icon> 加入购物车
               </a>
-              <a @click="addToFavorites(item.bid)" href="javascript:void(0);">
+              <a @click="addToFavoritesHandler(item.bid)" href="javascript:void(0);">
                 <el-icon><Star /></el-icon> 收藏
               </a>
             </div>
@@ -72,6 +72,7 @@ import SearchBox from "@/components/SearchBox.vue";
 import { QueryOptions, PagedBookList, getBookList } from "@/api/book";
 import { addToCart } from "@/api/order";
 import { ElMessage } from "element-plus";
+import { addToFavorites } from "@/api/favorites";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -87,17 +88,17 @@ const goodsList = reactive<PagedBookList>({
   items: [],
 });
 
-const queryOptions: QueryOptions = {}; 
+const queryOptions: QueryOptions = {};
 
 const setupList = async (query: LocationQuery) => {
   const page = query.page ? Number.parseInt(query.page as string) : 1;
   const pageSize = Number.parseInt((query.pageSize as string) ?? "20");
   Object.assign(queryOptions, {
-    keyword: query.keyword as string ?? "",
-    name: query.name as string ?? "",
-    author: query.author as string ?? "",
-    publisher: query.publisher as string ?? "",
-    desc: query.desc as string ?? "",
+    keyword: (query.keyword as string) ?? "",
+    name: (query.name as string) ?? "",
+    author: (query.author as string) ?? "",
+    publisher: (query.publisher as string) ?? "",
+    desc: (query.desc as string) ?? "",
   });
   Object.assign(goodsList, await getBookList(page, pageSize, queryOptions));
 };
@@ -110,17 +111,17 @@ const refreshList = async (page: number, pageSize: number) => {
   $router.push({ name: $route.name!, query });
 };
 
-const addToCartHandler =async (bid: number) => {
+const addToCartHandler = async (bid: number) => {
   const result = await addToCart(bid, 1);
   ElMessage.success(result.message);
 };
-const addToFavorites = (bid: number) => {
-  console.log(bid);
+const addToFavoritesHandler = async (bid: number) => {
+  const result = await addToFavorites(bid);
+  ElMessage.success(result.message);
 };
 
 const handleSizeChange = async (value: number) => await refreshList(1, value);
-const handleCurrentChange = async (value: number) =>
-  await refreshList(value, goodsList.pageSize);
+const handleCurrentChange = async (value: number) => await refreshList(value, goodsList.pageSize);
 </script>
 
 <style lang="scss">
