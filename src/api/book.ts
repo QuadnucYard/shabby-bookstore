@@ -12,6 +12,7 @@ export interface BookInfo {
   price: number;
   originalPrice: number;
   cover: string;
+  favorite?: boolean;
 }
 
 export interface Comment {

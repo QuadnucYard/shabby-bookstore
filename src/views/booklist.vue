@@ -41,8 +41,13 @@
               <a @click="addToCartHandler(item.bid)" href="javascript:void(0);">
                 <el-icon><ShoppingCart /></el-icon> 加入购物车
               </a>
-              <a @click="addToFavoritesHandler(item.bid)" href="javascript:void(0);">
-                <el-icon><Star /></el-icon> 收藏
+              <a @click="addToFavoritesHandler(item)" href="javascript:void(0);">
+                <template v-if="item.favorite">
+                  <el-icon><StarFilled /></el-icon> 已收藏
+                </template>
+                <template v-else>
+                  <el-icon><Star /></el-icon> 收藏
+                </template>
               </a>
             </div>
           </div>
@@ -62,6 +67,7 @@
         @current-change="handleCurrentChange"
       />
     </div>
+    <el-backtop :right="100" :bottom="100" />
   </div>
 </template>
 
@@ -69,10 +75,11 @@
 import _ from "lodash";
 import { LocationQuery, onBeforeRouteUpdate } from "vue-router";
 import SearchBox from "@/components/SearchBox.vue";
-import { QueryOptions, PagedBookList, getBookList } from "@/api/book";
+import { QueryOptions, PagedBookList, getBookList, BookInfo } from "@/api/book";
 import { addToCart } from "@/api/order";
 import { ElMessage } from "element-plus";
-import { addToFavorites } from "@/api/favorites";
+import { addToFavorites, removeFromFavorites } from "@/api/favorites";
+import { Star, StarFilled } from "@element-plus/icons-vue";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -115,9 +122,16 @@ const addToCartHandler = async (bid: number) => {
   const result = await addToCart(bid, 1);
   ElMessage.success(result.message);
 };
-const addToFavoritesHandler = async (bid: number) => {
-  const result = await addToFavorites(bid);
-  ElMessage.success(result.message);
+const addToFavoritesHandler = async (item: BookInfo) => {
+  if (!item.favorite) {
+    const result = await addToFavorites(item.bid);
+    ElMessage.success(result.message);
+    item.favorite = true;
+  } else {
+    const result = await removeFromFavorites([item.bid]);
+    ElMessage.success(result.message);
+    item.favorite =false ;
+  }
 };
 
 const handleSizeChange = async (value: number) => await refreshList(1, value);

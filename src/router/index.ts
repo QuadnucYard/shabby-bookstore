@@ -52,7 +52,6 @@ const routes: Array<RouteRecordRaw> = [
         path: "/:pathMatch(.*)",
         name: "error",
         component: () => import("@/views/pages/Error404.vue"),
-        alias: "/notfound",
       },
     ],
   },
