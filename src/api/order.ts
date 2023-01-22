@@ -2,7 +2,7 @@ import axios from "@/utils/request";
 import { BookInfo } from "./book";
 
 export interface ShoppingCartItem {
-  count: number;
+  count: int;
   book: BookInfo;
 }
 

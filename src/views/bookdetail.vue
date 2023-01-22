@@ -71,6 +71,14 @@
         </el-col>
       </el-row>
     </div>
+    <div class="detail" v-if="book">
+      <div class="mt"><h3>商品详情</h3></div>
+      <el-descriptions>
+        <el-descriptions-item v-for="[k, v] of Object.entries(book.keys)" :label="k">
+          {{ v }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </div>
     <div class="comment">
       <div class="mt"><h3>商品评价</h3></div>
       <div class="comments-list">
@@ -244,8 +252,20 @@ const addToFavoritesHandler = async () => {
   font-size: 14px;
 }
 
+.detail,
 .comment {
-  padding: 50px;
+  margin: 50px;
+  margin-bottom: 0;
+}
+
+.detail {
+  .el-descriptions {
+    margin: 20px;
+  }
+}
+
+.comment {
+  margin-bottom: 100px;
   .comment-item {
     padding: 15px;
     border-bottom: 1px solid #ddd;

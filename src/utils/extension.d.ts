@@ -1,5 +1,9 @@
 export {}; // this file needs to be a module
 declare global {
+
+  type int = number;
+  type float = number;
+
   interface Array<T> {
     firstOrDefault(predicate: (item: T) => boolean): T;
     orderBy(propertyExpression: (item: T) => any): T[];

@@ -130,7 +130,7 @@ const addToFavoritesHandler = async (item: BookInfo) => {
   } else {
     const result = await removeFromFavorites([item.bid]);
     ElMessage.success(result.message);
-    item.favorite =false ;
+    item.favorite = false;
   }
 };
 
@@ -196,6 +196,9 @@ const handleCurrentChange = async (value: number) => await refreshList(value, go
       line-height: 20px;
       text-align: left;
       overflow: hidden;
+      .el-link:not(:hover) {
+        --el-link-text-color: #009688;
+      }
       .el-link__inner {
         font-size: 12px;
       }

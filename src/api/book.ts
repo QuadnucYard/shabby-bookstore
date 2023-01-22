@@ -1,28 +1,35 @@
 import axios from "@/utils/request";
 
 export interface BookInfo {
-  bid: number;
+  bid: int;
   name: string;
   desc: string;
   author: string;
   publisher: string;
   publishDate: string;
-  rating: number;
-  numComments: number;
-  price: number;
-  originalPrice: number;
+  rating: int | null;
+  numComments: int;
+  price: float;
+  originalPrice: float;
   cover: string;
   favorite?: boolean;
+  keys: { [key: string]: string };
+}
+
+export interface Category {
+  id: int;
+  name: string;
+  children: Category[];
 }
 
 export interface Comment {
-  id: number;
-  uid: number;
-  bid: number;
+  id: int;
+  uid: int;
+  bid: int;
   uname: string;
-  rating: number;
+  rating: int;
   time: string;
-  likes: number;
+  likes: int;
   content: string;
 }
 
@@ -36,24 +43,28 @@ export interface QueryOptions {
 
 export interface PagedBookList {
   items: BookInfo[];
-  page: number;
-  pages: number;
-  total: number;
-  pageSize: number;
+  page: int;
+  pages: int;
+  total: int;
+  pageSize: int;
 }
 
 export async function getBookList(
-  page: number,
-  pageSize: number,
+  page: int,
+  pageSize: int,
   options: QueryOptions
 ): Promise<PagedBookList> {
   return (await axios.get("/book/list", { params: { page, pageSize, ...options } })).data.data;
 }
 
-export async function getBook(bid: number): Promise<BookInfo> {
+export async function getBook(bid: int): Promise<BookInfo> {
   return (await axios.get(`/book/b${bid}`)).data.data;
 }
 
-export async function getComments(bid: number): Promise<Comment[]> {
+export async function getComments(bid: int): Promise<Comment[]> {
   return (await axios.get(`/book/comments/c${bid}`)).data.data;
+}
+
+export async function getCategories() {
+  return (await axios.get("/category")).data.data;
 }
