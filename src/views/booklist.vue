@@ -1,6 +1,44 @@
 <template>
   <div>
     <SearchBox ref="searchBox" />
+    <div class="breadcrumb">
+      <el-breadcrumb separator="/" v-if="categories">
+        <el-breadcrumb-item>全部</el-breadcrumb-item>
+        <el-breadcrumb-item v-for="(c, i) in queryCates" :key="c">
+          <el-dropdown placement="bottom-start" v-if="categories.all[c].children_id.length > 0">
+            <span :underline="false" class="el-dropdown-link">
+              {{ categories.all[c].name }}
+              <el-icon class="el-icon--right"> <arrow-down /> </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <div class="list-product">
+                  <el-link
+                    v-for="cc in categories.all[c].children_id"
+                    :key="cc"
+                    :underline="false"
+                    @click="onChangeCategory(i, cc)"
+                  >
+                    {{ categories.all[cc].name }}
+                  </el-link>
+                </div>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <template v-else>
+            <span :underline="false" class="el-dropdown-link">
+              {{ categories.all[c].name }}
+            </span>
+          </template>
+        </el-breadcrumb-item>
+      </el-breadcrumb>
+      <span class="total">
+        共
+        <span style="color: dodgerblue">{{ goodsList.total }}</span>
+        件商品
+      </span>
+    </div>
+
     <!-- <div class="tools-box">
       <div style="float: right">
         <el-switch v-model="listMode" active-text="列表" inactive-text="大图" />
@@ -75,11 +113,10 @@
 import _ from "lodash";
 import { LocationQuery, onBeforeRouteUpdate } from "vue-router";
 import SearchBox from "@/components/SearchBox.vue";
-import { QueryOptions, PagedBookList, getBookList, BookInfo } from "@/api/book";
+import { QueryOptions, PagedBookList, getBookList, BookInfo, getCategories } from "@/api/book";
 import { addToCart } from "@/api/order";
 import { ElMessage } from "element-plus";
 import { addToFavorites, removeFromFavorites } from "@/api/favorites";
-import { Star, StarFilled } from "@element-plus/icons-vue";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -87,6 +124,9 @@ const $router = useRouter();
 const searchBox = ref(null);
 
 const listMode = ref(false); // false = grid, true = list
+
+const categories = ref<any>(null);
+
 const goodsList = reactive<PagedBookList>({
   page: 0,
   pages: 0,
@@ -96,6 +136,7 @@ const goodsList = reactive<PagedBookList>({
 });
 
 const queryOptions: QueryOptions = {};
+const queryCates = ref<int[]>([]);
 
 const setupList = async (query: LocationQuery) => {
   const page = query.page ? Number.parseInt(query.page as string) : 1;
@@ -107,18 +148,27 @@ const setupList = async (query: LocationQuery) => {
     publisher: (query.publisher as string) ?? "",
     desc: (query.desc as string) ?? "",
   });
-  Object.assign(goodsList, await getBookList(page, pageSize, queryOptions));
+  queryCates.value = ((query.categories as string) ?? "1").split(".").map(t => Number.parseInt(t));
+  Object.assign(goodsList, await getBookList(page, pageSize, queryOptions, queryCates.value.at(-1)!));
 };
 
-onMounted(async () => await setupList($route.query));
+onMounted(async () => {
+  categories.value = await getCategories();
+  await setupList($route.query);
+});
 onBeforeRouteUpdate(async to => await setupList(to.query));
 
-const refreshList = async (page: number, pageSize: number) => {
-  const query = _.pickBy({ page, pageSize, ...queryOptions });
+const refreshList = async (page: int, pageSize: int) => {
+  const query = _.pickBy({
+    page,
+    pageSize,
+    ...queryOptions,
+    categories: queryCates.value.join("."),
+  });
   $router.push({ name: $route.name!, query });
 };
 
-const addToCartHandler = async (bid: number) => {
+const addToCartHandler = async (bid: int) => {
   const result = await addToCart(bid, 1);
   ElMessage.success(result.message);
 };
@@ -134,11 +184,44 @@ const addToFavoritesHandler = async (item: BookInfo) => {
   }
 };
 
-const handleSizeChange = async (value: number) => await refreshList(1, value);
-const handleCurrentChange = async (value: number) => await refreshList(value, goodsList.pageSize);
+const handleSizeChange = async (value: int) => await refreshList(1, value);
+const handleCurrentChange = async (value: int) => await refreshList(value, goodsList.pageSize);
+
+const onChangeCategory = async (i: int, cid: int) => {
+  if (i + 1 < queryCates.value.length) {
+    queryCates.value.splice(i + 1);
+  }
+  queryCates.value[i + 1] = cid;
+  refreshList(1, goodsList.pageSize);
+};
 </script>
 
 <style lang="scss">
+.breadcrumb {
+  padding: 0 20px;
+  .el-breadcrumb {
+    display: inline-block;
+  }
+  .el-dropdown-link {
+    cursor: pointer;
+    color: var(--el-color-primary);
+    display: flex;
+    align-items: center;
+  }
+  .total {
+    margin-left: 2em;
+    font-size: 12px;
+  }
+}
+
+.list-product {
+  width: 320px;
+  .el-link {
+    margin: 0.5em 1em 0 0.5em;
+    font-size: 12px;
+  }
+}
+
 .tools-box {
   background-color: #ecf5ff;
   font-size: x-small;

@@ -52,9 +52,11 @@ export interface PagedBookList {
 export async function getBookList(
   page: int,
   pageSize: int,
-  options: QueryOptions
+  options: QueryOptions,
+  category: int
 ): Promise<PagedBookList> {
-  return (await axios.get("/book/list", { params: { page, pageSize, ...options } })).data.data;
+  const params = { page, pageSize, ...options, category };
+  return (await axios.get("/book/list", { params })).data.data;
 }
 
 export async function getBook(bid: int): Promise<BookInfo> {
