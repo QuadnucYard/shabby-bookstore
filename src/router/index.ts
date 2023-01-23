@@ -49,6 +49,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { keepalive: false, requireAuth: true },
       },
       {
+        path: "/shopping/checkout",
+        name: "checkout",
+        component: () => import("@/views/checkout.vue"),
+        meta: { keepalive: false, requireAuth: true },
+      },
+      {
         path: "/:pathMatch(.*)",
         name: "error",
         component: () => import("@/views/pages/Error404.vue"),

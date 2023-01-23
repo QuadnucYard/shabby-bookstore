@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { logout } from "@/api/auth";
 import { ElMessage } from "element-plus";
-import { HomeFilled, Shop, StarFilled, ShoppingCart, UserFilled } from "@element-plus/icons-vue";
+import { HomeFilled, Shop, StarFilled, ShoppingCart, UserFilled, List } from "@element-plus/icons-vue";
 import { auth } from "@/api/auth";
 
 const $router = useRouter();
@@ -52,6 +52,7 @@ const navList = [
   { name: "/book/list", navItem: "商品列表", comp: Shop },
   { name: "/favorites", navItem: "收藏夹", comp: StarFilled },
   { name: "/shopping_cart", navItem: "购物车", comp: ShoppingCart },
+  { name: "/shopping/checkout", navItem: "我的订单", comp: List },
 ];
 
 onMounted(async () => {
@@ -104,6 +105,6 @@ const toHome = () => {
 }
 
 .el-menu-item {
-  width: 8em;
+  width: 7em;
 }
 </style>

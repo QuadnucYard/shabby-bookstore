@@ -6,6 +6,16 @@ export interface ShoppingCartItem {
   book: BookInfo;
 }
 
+export interface Order {
+  id: int;
+  uid: int;
+  address: string;
+  create_time: string;
+  payment: string;
+  state: int;
+  items: ShoppingCartItem[];
+}
+
 export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
   return (await axios.get("/shopping_cart")).data.data;
 }
@@ -26,4 +36,12 @@ export async function moveToFavorites(bid: int | int[]) {
 
 export async function createOrder(bids: int[]) {
   return (await axios.post("/order/create", { bids })).data;
+}
+
+export async function getOrder(): Promise<Order> {
+  return (await axios.get("/order")).data.data;
+}
+
+export async function submitOrder() {
+  return (await axios.post("/order/submit")).data;
 }

@@ -68,6 +68,8 @@ import { ElMessage } from "element-plus";
 import _ from "lodash";
 import "@/utils/array-extensions";
 
+const $router = useRouter();
+
 const loading = ref(true);
 
 const checkAll = ref(true);
@@ -129,8 +131,13 @@ const onMoveToFavorites = async (bid?: int) => {
 
 const onCreateOrder = async () => {
   const result = await createOrder(checkedBids.value);
+  if (result.code != 200) {
+    ElMessage.warning(result.message);
+    return;
+  }
   tableData.value = tableData.value.filter(t => !t.checked);
   ElMessage.success(result.message);
+  setTimeout(() => $router.push({ name: "checkout" }), 1000);
 };
 </script>
 
