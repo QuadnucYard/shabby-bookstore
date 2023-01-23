@@ -2,7 +2,7 @@
   <div class="cart-wrap">
     <div class="cart">
       <div class="shopping-list">
-        <el-table :data="tableData">
+        <el-table :data="tableData" v-loading="loading">
           <el-table-column width="60" align="center">
             <template #header>
               <el-checkbox v-model="checkAll" label="全选" size="small" @change="onCheckAll" />
@@ -68,6 +68,8 @@ import { ElMessage } from "element-plus";
 import _ from "lodash";
 import "@/utils/array-extensions";
 
+const loading = ref(true);
+
 const checkAll = ref(true);
 
 interface ShoppingCartTableItem {
@@ -95,6 +97,7 @@ onMounted(async () => {
     price: t.book.price,
     count: t.count,
   }));
+  loading.value = false;
 });
 
 const checkedBids = computed(() => tableData.value.filter(t => t.checked).map(t => t.bid));

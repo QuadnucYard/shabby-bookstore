@@ -1,8 +1,8 @@
 <template>
   <div>
     <SearchBox ref="searchBox" />
-    <div class="breadcrumb">
-      <el-breadcrumb separator="/" v-if="categories">
+    <div class="breadcrumb" v-if="categories">
+      <el-breadcrumb separator="/">
         <el-breadcrumb-item>全部</el-breadcrumb-item>
         <el-breadcrumb-item v-for="(c, i) in queryCates" :key="c">
           <el-dropdown placement="bottom-start" v-if="categories.all[c].children_id.length > 0">
@@ -44,7 +44,7 @@
         <el-switch v-model="listMode" active-text="列表" inactive-text="大图" />
       </div>
     </div> -->
-    <div class="goods-list">
+    <div class="goods-list" v-loading="loading">
       <template v-for="item in goodsList.items" :key="item.bid">
         <div class="goods-item">
           <router-link :to="{ name: 'bookdetail', params: { bid: item.bid } }">
@@ -138,7 +138,10 @@ const goodsList = reactive<PagedBookList>({
 const queryOptions: QueryOptions = {};
 const queryCates = ref<int[]>([]);
 
+const loading = ref(true);
+
 const setupList = async (query: LocationQuery) => {
+  loading.value = true;
   const page = query.page ? Number.parseInt(query.page as string) : 1;
   const pageSize = Number.parseInt((query.pageSize as string) ?? "20");
   Object.assign(queryOptions, {
@@ -149,7 +152,11 @@ const setupList = async (query: LocationQuery) => {
     desc: (query.desc as string) ?? "",
   });
   queryCates.value = ((query.categories as string) ?? "1").split(".").map(t => Number.parseInt(t));
-  Object.assign(goodsList, await getBookList(page, pageSize, queryOptions, queryCates.value.at(-1)!));
+  Object.assign(
+    goodsList,
+    await getBookList(page, pageSize, queryOptions, queryCates.value.at(-1)!)
+  );
+  loading.value = false;
 };
 
 onMounted(async () => {

@@ -1,8 +1,8 @@
 <template>
   <div>
     <SearchBox />
-    <div class="book-intro" v-if="book">
-      <el-row :gutter="20">
+    <div class="book-intro" v-loading="loadingB">
+      <el-row :gutter="20" v-if="book">
         <el-col :span="8">
           <div class="preview-wrap">
             <el-image :src="book.cover" :alt="book.name" fit="contain" />
@@ -81,7 +81,7 @@
     </div>
     <div class="comment">
       <div class="mt"><h3>商品评价</h3></div>
-      <div class="comments-list">
+      <div class="comments-list" v-loading="loadingC">
         <template v-for="item in comments">
           <div class="comment-item">
             <div class="user-column">
@@ -126,6 +126,9 @@ const buyCount = ref(1);
 
 const comments = ref<Comment[]>([]);
 
+const loadingB = ref(true);
+const loadingC = ref(true);
+
 const print = console.log;
 
 const report = () => {
@@ -136,7 +139,9 @@ const bid = computed(() => Number.parseInt($route.params.bid as string));
 
 onMounted(async () => {
   book.value = await getBook(bid.value);
+  loadingB.value = false;
   comments.value = await getComments(bid.value);
+  loadingC.value = false;
 });
 
 const addToCartHandler = async () => {
