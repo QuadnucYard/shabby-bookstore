@@ -94,6 +94,9 @@
               <el-rate v-model="item.rating" disabled />
               <v-md-preview :text="item.content" />
               <div class="comment-message">
+                <div class="time">
+                  {{ item.post_time }}
+                </div>
                 <div class="comment-op">
                   <el-link :underline="false" class="op-nice" @click="report">
                     <el-icon><Star /></el-icon>
@@ -105,6 +108,15 @@
             </div>
           </div>
         </template>
+        <div v-if="comments.length == 0" class="prompt">
+          评论区空空如也，等待着您购买后的反馈呢！
+        </div>
+      </div>
+      <div v-if="user" class="post">
+        <h3 style="margin-bottom: 1em">发布评论</h3>
+        <el-rate v-model="myComment.star" />
+        <v-md-editor v-model="myComment.text" height="200px" />
+        <el-button type="primary" color="#43A047" @click="onPostComment">发布！</el-button>
       </div>
     </div>
   </div>
@@ -112,19 +124,26 @@
 
 <script setup lang="ts">
 import { UserFilled, ShoppingCart, StarFilled } from "@element-plus/icons-vue";
-import { BookInfo, Comment, getBook, getComments } from "@/api/book";
+import { BookInfo, Comment, getBook, getComments, postComment } from "@/api/book";
 import { addToCart } from "@/api/order";
 import { ElMessage } from "element-plus";
 import { addToFavorites } from "@/api/favorites";
 
 const $route = useRoute();
 const $router = useRouter();
+const $store = useStore();
 
 const book = ref<BookInfo | null>(null);
 
 const buyCount = ref(1);
 
 const comments = ref<Comment[]>([]);
+
+const user = $store.state.user;
+const myComment = reactive({
+  text: "",
+  star: 5,
+});
 
 const loadingB = ref(true);
 const loadingC = ref(true);
@@ -153,6 +172,14 @@ const addToCartHandler = async () => {
 const addToFavoritesHandler = async () => {
   const result = await addToFavorites(bid.value);
   ElMessage.success(result.message);
+};
+
+const onPostComment = async () => {
+  const result = await postComment(bid.value, myComment.star, myComment.text);
+  ElMessage.success(result.message);
+  comments.value.push(result.data);
+  myComment.star = 5;
+  myComment.text = "";
 };
 </script>
 
@@ -293,6 +320,11 @@ const addToFavoritesHandler = async () => {
       }
       .comment-message {
         height: 20px;
+        .time {
+          float: left;
+          font-size: 12px;
+          color: #777;
+        }
         .comment-op {
           float: right;
           .el-link {
@@ -303,6 +335,18 @@ const addToFavoritesHandler = async () => {
           }
         }
       }
+    }
+  }
+  .prompt {
+    padding: 10px;
+    font-size: 12px;
+    color: #444;
+  }
+  .post {
+    padding: 10px;
+    .el-button {
+      width: 80px;
+      margin: 10px;
     }
   }
 }

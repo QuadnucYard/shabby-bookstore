@@ -10,6 +10,8 @@ import "./styles/index.scss";
 
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 
+import VMdEditor from "@kangc/v-md-editor";
+import "@kangc/v-md-editor/lib/style/base-editor.css";
 import VMdPreview from "@kangc/v-md-editor/lib/preview";
 import "@kangc/v-md-editor/lib/style/preview.css";
 import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
@@ -17,13 +19,12 @@ import "@kangc/v-md-editor/lib/theme/style/github.css";
 
 // highlightjs
 // import hljs from "highlight.js";
-VMdPreview.use(githubTheme, {
-  // Hljs: hljs,
-});
+VMdPreview.use(githubTheme);
+VMdEditor.use(githubTheme);
 
 const app = createApp(App);
 app.use(router).use(ElementPlus).use(store);
-app.use(VMdPreview);
+app.use(VMdPreview).use(VMdEditor);
 console.log(app);
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

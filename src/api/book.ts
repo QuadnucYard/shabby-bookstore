@@ -31,6 +31,7 @@ export interface Comment {
   time: string;
   likes: int;
   content: string;
+  post_time: string;
 }
 
 export interface QueryOptions {
@@ -69,4 +70,8 @@ export async function getComments(bid: int): Promise<Comment[]> {
 
 export async function getCategories() {
   return (await axios.get("/category")).data.data;
+}
+
+export async function postComment(bid: int, star: int, content: string) {
+  return (await axios.post("/book/comments/post", { bid, star, content })).data;
 }
