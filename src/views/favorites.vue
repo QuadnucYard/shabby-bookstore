@@ -50,11 +50,11 @@ import "@/utils/array-extensions";
 const checkAll = ref(true);
 
 interface FavoritesTableItem {
-  bid: number;
+  bid: int;
   checked: boolean;
   name: string;
   cover: string;
-  price: number;
+  price: float;
 }
 
 const tableData = ref<FavoritesTableItem[]>([]);
@@ -76,7 +76,7 @@ const onCheckAll = (value: any) => {
   tableData.value.forEach(t => (t.checked = value));
 };
 
-const smartRemove = (bid?: number) => {
+const smartRemove = (bid?: int) => {
   if (bid) {
     tableData.value.removeAt(tableData.value.findIndex(t => t.bid == bid));
   } else {
@@ -84,13 +84,13 @@ const smartRemove = (bid?: number) => {
   }
 };
 
-const onRemoveFromFavorites = async (bid?: number) => {
+const onRemoveFromFavorites = async (bid?: int) => {
   const result = await removeFromFavorites(bid ? [bid] : checkedBids.value);
   ElMessage.success(result.message);
   smartRemove(bid);
 };
 
-const onMoveToCart = async (bid?: number) => {
+const onMoveToCart = async (bid?: int) => {
   const result = await moveFavoriteToCart(bid ? [bid] : checkedBids.value);
   ElMessage.success(result.message);
   smartRemove(bid);

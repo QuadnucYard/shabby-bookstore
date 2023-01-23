@@ -71,12 +71,12 @@ import "@/utils/array-extensions";
 const checkAll = ref(true);
 
 interface ShoppingCartTableItem {
-  bid: number;
+  bid: int;
   checked: boolean;
   name: string;
   cover: string;
-  price: number;
-  count: number;
+  price: float;
+  count: int;
 }
 
 const tableData = ref<ShoppingCartTableItem[]>([]);
@@ -103,7 +103,7 @@ const onCheckAll = (value: any) => {
   tableData.value.forEach(t => (t.checked = value));
 };
 
-const smartRemove = (bid?: number) => {
+const smartRemove = (bid?: int) => {
   console.log("smartRemove", bid, tableData.value.findIndex(t => t.bid == bid));
   if (bid) {
     tableData.value.removeAt(tableData.value.findIndex(t => t.bid == bid));
@@ -112,13 +112,13 @@ const smartRemove = (bid?: number) => {
   }
 };
 
-const onRemoveFromCart = async (bid?: number) => {
+const onRemoveFromCart = async (bid?: int) => {
   const result = await removeFromCart(bid ?? checkedBids.value);
   ElMessage.success(result.message);
   smartRemove(bid);
 };
 
-const onMoveToFavorites = async (bid?: number) => {
+const onMoveToFavorites = async (bid?: int) => {
   await moveToFavorites(bid ?? checkedBids.value);
   ElMessage.success("成功移入收藏夹");
   smartRemove(bid);
