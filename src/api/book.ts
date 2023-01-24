@@ -7,7 +7,7 @@ export interface BookInfo {
   author: string;
   publisher: string;
   publishDate: string;
-  rating: int | null;
+  rating: int;
   numComments: int;
   price: float;
   originalPrice: float;

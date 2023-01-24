@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { register } from "@/api/auth";
 import { encrypt } from "@/utils/rsaEncrypt";
-import type { FormInstance } from "element-plus";
+import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
 
 const $route = useRoute();
@@ -71,7 +71,7 @@ const registerForm = reactive({
   address: "",
   agreed: false,
 });
-const rules = {
+const rules: FormRules = {
   username: [
     { required: true, type: "string", message: "请输入用户名", trigger: "blur" },
     { min: 3, message: "用户名不能太短！", trigger: "blur" },
