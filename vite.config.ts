@@ -13,7 +13,7 @@ const pathSrc = path.resolve(__dirname, "src");
 // https://vitejs.dev/config/
 export default ({ mode }) =>
   defineConfig({
-    base: "/shabby-bookstore/", // 解决dist资源路径问题
+    base: "./", // 解决dist资源路径问题
     resolve: {
       alias: {
         "@": path.join(__dirname, "./src"),
@@ -65,8 +65,8 @@ export default ({ mode }) =>
       //Inspect(),
     ],
     server: {
-      host: "0.0.0.0",
-      port: 3000,
+      // host: "0.0.0.0",
+      // port: 3000,
       proxy: {
         "/api": {
           target: loadEnv(mode, process.cwd()).VITE_APP_BASE_API,
