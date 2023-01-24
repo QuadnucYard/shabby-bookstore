@@ -1,1 +1,0 @@
-import{s as t}from"./index-bec14a8b.js";async function r(a){return(await t.post("/auth/register",a)).data}async function o(a){return(await t.post("/auth/login",a)).data}async function s(){return await t.get("/auth/logout")}async function u(){return await t.get("/auth")}export{u as a,o as b,s as l,r};
