@@ -13,6 +13,7 @@ const pathSrc = path.resolve(__dirname, "src");
 // https://vitejs.dev/config/
 export default ({ mode }) =>
   defineConfig({
+    base: "./", // 解决dist资源路径问题
     resolve: {
       alias: {
         "@": path.join(__dirname, "./src"),
