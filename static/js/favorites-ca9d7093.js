@@ -1,1 +1,0 @@
-import{s as t}from"./index-92d13067.js";async function r(){return(await t.get("/favorite")).data.data}async function e(a){return(await t.post("/favorite/add",{bid:a})).data}async function i(a){return(await t.post("/favorite/remove",{bids:a})).data}async function s(a){return(await t.post("/favorite/move",{bids:a})).data}export{e as a,r as g,s as m,i as r};
