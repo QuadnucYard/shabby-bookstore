@@ -26,7 +26,7 @@
           <!-- <el-button size="small" round @click="sendMsg">发送验证码</el-button>
             <span class="status">{{ statusMsg }}</span> -->
         </el-form-item>
-        <el-form-item label="电话" prop="phone">
+        <el-form-item label="联系方式" prop="phone">
           <el-input v-model="registerForm.phone" />
         </el-form-item>
         <el-form-item label="姓名" prop="name">
@@ -55,12 +55,10 @@ import { register } from "@/api/auth";
 import { encrypt } from "@/utils/rsaEncrypt";
 import type { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
-import { useRoute, useRouter } from "vue-router";
-import { useStore } from "vuex";
 
-const route = useRoute();
-const router = useRouter();
-const store = useStore();
+const $route = useRoute();
+const $router = useRouter();
+const $store = useStore();
 
 const registerForm = reactive({
   username: "",
@@ -74,11 +72,21 @@ const registerForm = reactive({
   agreed: false,
 });
 const rules = {
-  agreed: [
+  username: [
+    { required: true, type: "string", message: "请输入用户名", trigger: "blur" },
+    { min: 3, message: "用户名不能太短！", trigger: "blur" },
+    { max: 16, message: "用户名不能太长！", trigger: "blur" },
+  ],
+  email: [{ required: true, type: "email", message: "请输入邮箱", trigger: "blur" }],
+  pwd: [{ required: true, message: "创建密码", trigger: "blur" }],
+  cpwd: [
+    { required: true, message: "确认密码", trigger: "blur" },
     {
-      validator: (rule, value, callback) => {
-        if (value !== true) {
-          callback(new Error("请确认同意注册协议"));
+      validator: (rule: any, value: any, callback: any) => {
+        if (value === "") {
+          callback(new Error("请再次输入密码"));
+        } else if (value !== registerForm.pwd) {
+          callback(new Error("两次输入密码不一致"));
         } else {
           callback();
         }
@@ -86,41 +94,20 @@ const rules = {
       trigger: "blur",
     },
   ],
-  username: [
-    {
-      required: true,
-      type: "string",
-      message: "请输入用户名",
-      trigger: "blur",
-    },
+  phone: [{ required: true, message: "请输入联系方式", trigger: "blur" }],
+  name: [
+    { required: true, message: "请输入姓名", trigger: "blur" },
+    { min: 2, max: 10, message: "您确定姓名没有填错？", trigger: "blur" },
   ],
-  email: [
-    {
-      required: true,
-      type: "email",
-      message: "请输入邮箱",
-      trigger: "blur",
-    },
+  address: [
+    { required: true, message: "请输入地址", trigger: "blur" },
+    { min: 8, message: "不填详细点真的说得过去吗？", trigger: "blur" },
   ],
-  pwd: [
+  agreed: [
     {
-      required: true,
-      message: "创建密码",
-      trigger: "blur",
-    },
-  ],
-  cpwd: [
-    {
-      required: true,
-      message: "确认密码",
-      trigger: "blur",
-    },
-    {
-      validator: (rule, value, callback) => {
-        if (value === "") {
-          callback(new Error("请再次输入密码"));
-        } else if (value !== registerForm.pwd) {
-          callback(new Error("两次输入密码不一致"));
+      validator: (rule: any, value: any, callback: any) => {
+        if (value !== true) {
+          callback(new Error("请确认同意注册协议"));
         } else {
           callback();
         }
@@ -135,9 +122,8 @@ async function submitForm(formEl: FormInstance) {
   console.log("submit register111");
   await formEl.validate(async (valid, fields) => {
     if (!valid) {
-      //return;
+      return;
     }
-    console.log("submit register");
     const res = await register({
       username: registerForm.username,
       password: encrypt(registerForm.pwd),
@@ -148,8 +134,8 @@ async function submitForm(formEl: FormInstance) {
     });
     console.log("reRegister", res);
     if (res.code == 200) {
-      store.commit("login", res.data);
-      router.replace({ path: (route.query.redirect as string) ?? "/" });
+      $store.commit("login", res.data);
+      $router.replace({ path: ($route.query.redirect as string) ?? "/auth/login" });
       ElMessage.success(res.message);
     } else {
       ElMessage.error(res.message);
