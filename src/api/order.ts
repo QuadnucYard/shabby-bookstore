@@ -34,6 +34,10 @@ export async function moveToFavorites(bid: int | int[]) {
   return (await axios.post("/shopping_cart/move", { bids })).data;
 }
 
+export async function updateCartItem(bid: int, count: int) {
+  return (await axios.post("/shopping_cart/update", { bid, count })).data;
+}
+
 export async function createOrder(bids: int[]) {
   return (await axios.post("/order/create", { bids })).data;
 }

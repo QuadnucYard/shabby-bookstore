@@ -49,12 +49,14 @@
               </div>
             </div>
             <div class="buy-box">
-              <el-input-number v-model="buyCount" :min="1" controls-position="right" />
+              <span data-src="quantity">剩余数量：{{ book.quantity }}</span>
+              <el-input-number v-model="buyCount" :min="1" :max="book.quantity" controls-position="right" />
               <el-button
                 type="primary"
                 :icon="ShoppingCart"
                 color="#E53935"
                 @click="addToCartHandler"
+                :disabled="book.quantity <= 0"
               >
                 加入购物车
               </el-button>
@@ -187,6 +189,11 @@ const onPostComment = async () => {
 .book-intro {
   margin-top: 10px;
   margin-bottom: 10px;
+  .preview-wrap {
+    .el-image {
+      width: 90%;
+    }
+  }
   .item-info-wrap {
     .title {
       font-size: larger;
@@ -263,6 +270,11 @@ const onPostComment = async () => {
     }
     .buy-box {
       margin-top: 10px;
+      [data-src="quantity"] {
+        font-size: 12px;
+        color: #666;
+        margin-right: 20px;
+      }
       .el-input-number {
         width: 80px;
         margin-right: 20px;

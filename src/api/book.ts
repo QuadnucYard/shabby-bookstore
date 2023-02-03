@@ -12,6 +12,7 @@ export interface BookInfo {
   price: float;
   originalPrice: float;
   cover: string;
+  quantity: int;
   favorite?: boolean;
   keys: { [key: string]: string };
 }

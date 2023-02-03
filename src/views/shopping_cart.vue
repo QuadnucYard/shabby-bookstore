@@ -26,7 +26,13 @@
           </el-table-column>
           <el-table-column width="120" label="数量" align="center">
             <template #default="scope">
-              <el-input-number v-model="scope.row.count" :min="1" size="small" />
+              <el-input-number
+                v-model="scope.row.count"
+                :min="1"
+                :max="scope.row.maxCount"
+                size="small"
+                @change="onChangeCount(scope.row.bid, scope.row.count)"
+              />
             </template>
           </el-table-column>
           <el-table-column width="120" label="金额（元）" align="center">
@@ -63,7 +69,13 @@
 </template>
 
 <script setup lang="ts">
-import { getShoppingCart, removeFromCart, createOrder, moveToFavorites } from "@/api/order";
+import {
+  getShoppingCart,
+  removeFromCart,
+  createOrder,
+  moveToFavorites,
+  updateCartItem,
+} from "@/api/order";
 import { ElMessage } from "element-plus";
 import _ from "lodash";
 import "@/utils/array-extensions";
@@ -81,6 +93,7 @@ interface ShoppingCartTableItem {
   cover: string;
   price: float;
   count: int;
+  maxCount: int;
 }
 
 const tableData = ref<ShoppingCartTableItem[]>([]);
@@ -98,6 +111,7 @@ onMounted(async () => {
     cover: t.book.cover,
     price: t.book.price,
     count: t.count,
+    maxCount: t.book.quantity,
   }));
   loading.value = false;
 });
@@ -109,7 +123,11 @@ const onCheckAll = (value: any) => {
 };
 
 const smartRemove = (bid?: int) => {
-  console.log("smartRemove", bid, tableData.value.findIndex(t => t.bid == bid));
+  console.log(
+    "smartRemove",
+    bid,
+    tableData.value.findIndex(t => t.bid == bid)
+  );
   if (bid) {
     tableData.value.removeAt(tableData.value.findIndex(t => t.bid == bid));
   } else {
@@ -127,6 +145,14 @@ const onMoveToFavorites = async (bid?: int) => {
   await moveToFavorites(bid ?? checkedBids.value);
   ElMessage.success("成功移入收藏夹");
   smartRemove(bid);
+};
+
+const onChangeCount = async (bid: int, count: int) => {
+  const result = await updateCartItem(bid, count);
+  if (result.code != 200) {
+    ElMessage.warning(result.message);
+    return;
+  }
 };
 
 const onCreateOrder = async () => {
